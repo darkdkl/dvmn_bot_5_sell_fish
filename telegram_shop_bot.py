@@ -138,6 +138,7 @@ def wait_email(bot,update):
     full_name=update.message.chat.first_name+'\xa0'+update.message.chat.last_name
     if moltin_api.get_customer(moltin_api.create_customer(full_name,text)):
         created='Зарегистрирован новый покупатель'
+        
     else:created='Вы допустили ошибку при вводе e-mail,либо  такой пользователь существует'
 
     bot.send_message(chat_id=update.message.chat_id, text=created)
