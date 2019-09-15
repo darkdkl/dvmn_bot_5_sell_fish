@@ -4,9 +4,8 @@
 ## Пример работы:
 
 
-![Screenshot](examination_vk.gif)
+![Screenshot](shop_telegram.gif)
 
-![Screenshot](examination_tg.gif) 
 
 ## Перед первым запуском необходимо выполнить ряд обязательных условий :
 
