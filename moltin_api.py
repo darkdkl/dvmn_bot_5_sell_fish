@@ -2,19 +2,10 @@ import requests
 import redis
 import os
 import time
+from db_redis_connect import get_database_connection
 
 
-_database = None
 
-def get_database_connection():
-    
-    global _database
-    if _database is None:
-        database_password = os.getenv("DATABASE_PASSWORD")
-        database_host = os.getenv("DATABASE_HOST")
-        database_port = os.getenv("DATABASE_PORT")
-        _database = redis.Redis(host=database_host, port=database_port, password=database_password)
-    return _database
 
 def get_token():
     db=get_database_connection()
@@ -22,8 +13,8 @@ def get_token():
         
     if db.get('expired') is None or  int(db.get('expired')) <= int(time.time()):
         data = {
-        'client_id':os.getenv("MOLTIN_CLIENT_ID") ,
-        'client_secret': os.getenv("MOLTIN_CLIENT_SECRET"),
+        'client_id':os.environ["MOLTIN_CLIENT_ID"] ,
+        'client_secret': os.environ["MOLTIN_CLIENT_SECRET"],
         'grant_type': 'client_credentials',
         }
         response = requests.post('https://api.moltin.com/oauth/access_token', data=data)
@@ -103,3 +94,24 @@ def delete_item_from_cart(chat_id,id_item):
 
     return response.json()
 
+def create_customer(name,email):
+    headers = {
+        'Authorization': f'Bearer {get_token()}',
+    }
+    data={
+        "data": {
+        "type": "customer",
+        "name": f'{name}',
+        "email": f'{email}',}
+         }
+    response = requests.post('https://api.moltin.com/v2/customers', headers=headers, json=data)
+    if response.ok:
+        return response.json()['data']['id']
+    else: response.json()
+
+
+def get_customer(id):
+    headers = {'Authorization': f'Bearer {get_token()}'}
+    response = requests.get(f'https://api.moltin.com/v2/customers/{id}',headers=headers)
+    return response.ok
+         

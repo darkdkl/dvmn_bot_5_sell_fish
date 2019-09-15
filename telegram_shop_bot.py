@@ -5,9 +5,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Filters, Updater
 from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler
 import moltin_api
-
-
-_database = None
+from db_redis_connect import get_database_connection
 
 
 def start(bot, update):
@@ -128,12 +126,21 @@ def delete_from_cart(bot,update):
                        message_id=query.message.message_id)
     
     
+def ask_email(bot,update):
+    chat_id = update.callback_query.message.chat_id
+    bot.send_message(chat_id=chat_id, text='''
+    Для продолжения оформления заказа,сообщите своей e-mail''')
 
+    return "WAITING_EMAIL"
 
 def wait_email(bot,update):
-    print('ждем почту')
-    users_reply = update.message.text
-    update.message.reply_text(users_reply)
+    text=update.message.text
+    full_name=update.message.chat.first_name+'\xa0'+update.message.chat.last_name
+    if moltin_api.get_customer(moltin_api.create_customer(full_name,text)):
+        created='Зарегистрирован новый покупатель'
+    else:created='Вы допустили ошибку при вводе e-mail,либо  такой пользователь существует'
+
+    bot.send_message(chat_id=update.message.chat_id, text=created)
 
     return "WAITING_EMAIL"
     
@@ -161,7 +168,7 @@ def handle_users_reply(bot, update):
     elif user_reply == 'cart':
         user_state = 'HANDLE_CART'
     elif user_reply == 'pay':
-        user_state = 'WAITING_EMAIL'
+        user_state = 'ASK_EMAIL'
     
     else:
         user_state = db.get(chat_id).decode("utf-8")
@@ -172,37 +179,27 @@ def handle_users_reply(bot, update):
         'HANDLE_DESCRIPTION': get_handle_description,
         'DELETE_FROM_CART':delete_from_cart,
         'HANDLE_CART':get_cart,
-        'WAITING_EMAIL':wait_email
+        "ASK_EMAIL": ask_email,
+        'WAITING_EMAIL':wait_email,
     
         
     }
 
     state_handler = states_functions[user_state]
-    print(state_handler)
+    
     try:
         next_state = state_handler(bot, update)
-        print(next_state)
+        
         db.set(chat_id, next_state)
     except Exception as err:
         print(err)
 
 
-def get_database_connection():
-    """
-    Возвращает конекшн с базой данных Redis, либо создаёт новый, если он ещё не создан.
-    """
-    global _database
-    if _database is None:
-        database_password = os.getenv("DATABASE_PASSWORD")
-        database_host = os.getenv("DATABASE_HOST")
-        database_port = os.getenv("DATABASE_PORT")
-        _database = redis.Redis(
-            host=database_host, port=database_port, password=database_password)
-    return _database
+get_database_connection()
 
 
 if __name__ == '__main__':
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    token = os.environ["TELEGRAM_BOT_TOKEN"]
     updater = Updater(token)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CallbackQueryHandler(handle_users_reply))
