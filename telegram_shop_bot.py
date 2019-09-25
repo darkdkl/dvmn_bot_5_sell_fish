@@ -43,19 +43,18 @@ def get_handle_menu(bot, update):
     description = items['description']
     text = f'{name}\n{price} in Kg \n {amount} kg in stock \n {description}'
     keyboard = [[InlineKeyboardButton("1 kg", callback_data=f'1kg:{query.data}'),
-                 InlineKeyboardButton(
-                     "5 kg", callback_data=f'5kg:{query.data}'),
+                 InlineKeyboardButton("5 kg", callback_data=f'5kg:{query.data}'),
                  InlineKeyboardButton("10 kg", callback_data=f'10kg:{query.data}')],
                 [InlineKeyboardButton("Назад", callback_data='/start')],
                 [InlineKeyboardButton("Корзина", callback_data='cart')]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.delete_message(chat_id=chat_id,
-                       message_id=query.message.message_id)
+    
     bot.send_photo(
         chat_id=chat_id, photo=f'{moltin_api.get_image_url(query.data)}', caption=text, reply_markup=reply_markup)
-
+    bot.delete_message(chat_id=chat_id,
+                       message_id=query.message.message_id)
     return 'HANDLE_DESCRIPTION'
 
 
@@ -137,11 +136,12 @@ def wait_email(bot,update):
     text=update.message.text
     full_name=update.message.chat.first_name+'\xa0'+update.message.chat.last_name
     if moltin_api.get_customer(moltin_api.create_customer(full_name,text)):
-        created='Зарегистрирован новый покупатель'
+        message='Зарегистрирован новый покупатель'
         
-    else:created='Вы допустили ошибку при вводе e-mail,либо  такой пользователь существует'
+    else:
+        message='Вы допустили ошибку при вводе e-mail,либо  такой пользователь существует'
 
-    bot.send_message(chat_id=update.message.chat_id, text=created)
+    bot.send_message(chat_id=update.message.chat_id, text=message)
 
     return "WAITING_EMAIL"
     
@@ -196,7 +196,7 @@ def handle_users_reply(bot, update):
         print(err)
 
 
-get_database_connection()
+
 
 
 if __name__ == '__main__':
