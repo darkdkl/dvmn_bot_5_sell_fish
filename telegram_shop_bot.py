@@ -107,8 +107,8 @@ def get_cart(bot,update):
     keyboard.append([InlineKeyboardButton("в Меню", callback_data='/start')])
     
     reply_markup = InlineKeyboardMarkup(keyboard)
-
-    bot.send_message(chat_id=chat_id, text=' '.join((map(' '.join, items_in_cart))),reply_markup=reply_markup) 
+    items_in_cart_string=' '.join((map(' '.join, items_in_cart)))
+    bot.send_message(chat_id=chat_id, text=items_in_cart_string,reply_markup=reply_markup) 
     return 'DELETE_FROM_CART'
 
 
@@ -136,7 +136,7 @@ def wait_email(bot,update):
     text=update.message.text
     full_name=update.message.chat.first_name+'\xa0'+update.message.chat.last_name
     if moltin_api.get_customer(moltin_api.create_customer(full_name,text)):
-        message='Зарегистрирован новый покупатель'
+        message='Зарегистрирован новый покупатель,отдел продаж свяжется с Вами  в ближайшее время'
         
     else:
         message='Вы допустили ошибку при вводе e-mail,либо  такой пользователь существует'
