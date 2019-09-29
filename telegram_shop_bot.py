@@ -60,19 +60,20 @@ def get_handle_menu(bot, update):
 
 def get_handle_description(bot, update):
     query = update.callback_query
-    weight_and_id = query.data.split(':')
+    weight,id_item = query.data.split(':')
+
     chat_id = query.message.chat_id
     if query.data == 'go_back':
 
         return 'START'
 
-    if weight_and_id[0] == '1kg':
-        moltin_api.add_cart(weight_and_id[1], 1, chat_id)
+    if weight == '1kg':
+        moltin_api.add_cart(id_item, 1, chat_id)
 
-    elif weight_and_id[0] == '5kg':
-        moltin_api.add_cart(weight_and_id[1], 5, chat_id)
-    elif weight_and_id[0] == '10kg':
-        moltin_api.add_cart(weight_and_id[1], 10, chat_id)
+    elif weight == '5kg':
+        moltin_api.add_cart(id_item, 5, chat_id)
+    elif weight == '10kg':
+        moltin_api.add_cart(id_item, 10, chat_id)
 
 
    
