@@ -22,7 +22,7 @@ def get_token():
             db.set('expires', expires)
             db.set('access_token', token)
         else:
-            print(response.text)
+            return None
     else:
         token = db.get('access_token').decode("utf-8")
 
@@ -39,7 +39,7 @@ def get_items(item_id=None):
     if response.ok:
         return response.json()
     else:
-        print(response.text)
+        return None
 
 
 def add_cart(item_id, quantity, chat_id):
@@ -54,7 +54,7 @@ def add_cart(item_id, quantity, chat_id):
     if response.ok:
         return response.json()
     else:
-        print(response.text)
+        return None
 
 
 def get_items_cart(chat_id, bill=None):
@@ -62,10 +62,10 @@ def get_items_cart(chat_id, bill=None):
     if bill:
 
         response = requests.get(f'https://api.moltin.com/v2/carts/{chat_id}', headers=headers )
-        if not response.ok: print(response.text)
+        if not response.ok: return None
     else:
         response = requests.get( f'https://api.moltin.com/v2/carts/{chat_id}/items', headers=headers )
-        if not response.ok: print(response.text)
+        if not response.ok: return None
     return response.json()
 
 
@@ -81,29 +81,28 @@ def get_image_url(id_item):
 
         return image_url
     else:
-        print(response.text)
+        return None
 
 def delete_item_from_cart(chat_id, id_item):
 
-    headers = {
-        'Authorization': f'Bearer {get_token()}',
-               }
+    headers = {'Authorization': f'Bearer {get_token()}' }
 
     response = requests.delete(f'https://api.moltin.com/v2/carts/{chat_id}/items/{id_item}', headers=headers)
     if response.ok:
         return response.json()
     else:
-        print(response.text)
+        return None
 
 
 def create_customer(name, email):
     headers = {'Authorization': f'Bearer {get_token()}', } 
     data = {
             "data": {
-            "type": "customer",
-            "name": f'{name}',
-            "email": f'{email}', }
-            }
+                    "type": "customer",
+                    "name": f'{name}',
+                    "email": f'{email}', 
+                    }
+           }
     response = requests.post('https://api.moltin.com/v2/customers', headers=headers, json=data)
     if response.ok:
         return response.json()['data']['id']
@@ -116,5 +115,4 @@ def get_customer(customer_id):
     response = requests.get(f'https://api.moltin.com/v2/customers/{customer_id}', headers=headers )
     if response.ok:
         return response.ok
-    else:
-        print(response.text)
+    
