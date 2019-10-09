@@ -14,7 +14,7 @@ def get_token():
                 'client_secret': os.environ["MOLTIN_CLIENT_SECRET"],
                  'grant_type': 'client_credentials',
                 }
-             
+            
         response = requests.post('https://api.moltin.com/oauth/access_token', data=data)
         if response.ok:
             expires = response.json()['expires']
@@ -50,7 +50,7 @@ def add_cart(item_id, quantity, chat_id):
         "quantity": quantity}
                     }
     response = requests.post(f'https://api.moltin.com/v2/carts/{chat_id}/items', headers=headers, json=data )
-    
+
     if response.ok:
         return response.json()
     else:
@@ -83,9 +83,10 @@ def get_image_url(id_item):
     else:
         return None
 
+
 def delete_item_from_cart(chat_id, id_item):
 
-    headers = {'Authorization': f'Bearer {get_token()}' }
+    headers = {'Authorization': f'Bearer {get_token()}'}
 
     response = requests.delete(f'https://api.moltin.com/v2/carts/{chat_id}/items/{id_item}', headers=headers)
     if response.ok:
@@ -95,12 +96,12 @@ def delete_item_from_cart(chat_id, id_item):
 
 
 def create_customer(name, email):
-    headers = {'Authorization': f'Bearer {get_token()}', } 
+    headers = {'Authorization': f'Bearer {get_token()}'}
     data = {
             "data": {
                     "type": "customer",
                     "name": f'{name}',
-                    "email": f'{email}', 
+                    "email": f'{email}' 
                     }
            }
     response = requests.post('https://api.moltin.com/v2/customers', headers=headers, json=data)
@@ -115,4 +116,3 @@ def get_customer(customer_id):
     response = requests.get(f'https://api.moltin.com/v2/customers/{customer_id}', headers=headers )
     if response.ok:
         return response.ok
-    
