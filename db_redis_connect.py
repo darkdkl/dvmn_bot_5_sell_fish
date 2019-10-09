@@ -1,4 +1,6 @@
-import redis,os
+import redis
+import os
+
 
 _database = None
 
@@ -12,4 +14,4 @@ def get_database_connection():
         _database = redis.Redis(
             host=database_host, port=database_port, password=database_password)
 
-   return _database
+    return _database

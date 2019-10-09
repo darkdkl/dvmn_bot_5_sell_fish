@@ -1,5 +1,4 @@
 import requests
-import redis
 import os
 import time
 from db_redis_connect import get_database_connection
@@ -8,13 +7,13 @@ from db_redis_connect import get_database_connection
 def get_token():
     db = get_database_connection()
 
-    if db.get('expires') is None or int(db.get('expires')) <= int(time.time()+20):
+    if db.get('expires') is None or int(db.get('expires')) <= int(time.time() + 20):
         data = {
                 'client_id': os.environ["MOLTIN_CLIENT_ID"],
                 'client_secret': os.environ["MOLTIN_CLIENT_SECRET"],
-                 'grant_type': 'client_credentials',
+                'grant_type': 'client_credentials',
                 }
-            
+
         response = requests.post('https://api.moltin.com/oauth/access_token', data=data)
         if response.ok:
             expires = response.json()['expires']
@@ -62,10 +61,12 @@ def get_items_cart(chat_id, bill=None):
     if bill:
 
         response = requests.get(f'https://api.moltin.com/v2/carts/{chat_id}', headers=headers )
-        if not response.ok: return None
+        if not response.ok:
+            return None
     else:
-        response = requests.get( f'https://api.moltin.com/v2/carts/{chat_id}/items', headers=headers )
-        if not response.ok: return None
+        response = requests.get(f'https://api.moltin.com/v2/carts/{chat_id}/items', headers=headers )
+        if not response.ok:
+            return None
     return response.json()
 
 
